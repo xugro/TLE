@@ -422,7 +422,7 @@ class Handles(commands.Cog):
     @commands.has_any_role(constants.TLE_ADMIN, constants.TLE_MODERATOR)
     async def setregistermessage(self, ctx, message:str, label:str ):
         """Generate a message with a button for people to link their codeforces accounts."""
-        await ctx.send(message, view=PersistentView() )
+        await ctx.send(message, view=permaview.PersistentView() )
 
     @handle.command(brief='Get handle by Discord username')
     async def get(self, ctx, member: discord.Member):
