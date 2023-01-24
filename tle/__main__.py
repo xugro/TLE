@@ -84,7 +84,7 @@ async def main():
         asyncio.create_task(discord_common.presence(bot))
 
     bot.add_listener(discord_common.bot_error_handler, name='on_command_error')
-    bot.add_view(permaview.PersistenView())
+    bot.add_view(permaview.PersistentView())
     await bot.start(token)
 
 
