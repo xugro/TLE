@@ -25,6 +25,7 @@ from tle.util import paginator
 from tle.util import table
 from tle.util import tasks
 from tle.util import db
+from tle.util import permaview
 from tle import constants
 from tle.cogs import codeforces as cfc
 
