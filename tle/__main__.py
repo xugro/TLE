@@ -15,6 +15,7 @@ from matplotlib import pyplot as plt
 from tle import constants
 from tle.util import codeforces_common as cf_common
 from tle.util import discord_common, font_downloader
+from tle.util import permaview
 
 
 
@@ -83,6 +84,7 @@ async def main():
         asyncio.create_task(discord_common.presence(bot))
 
     bot.add_listener(discord_common.bot_error_handler, name='on_command_error')
+    bot.add_view(permaview.PersistenView())
     await bot.start(token)
 
 
