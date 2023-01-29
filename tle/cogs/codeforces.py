@@ -402,7 +402,7 @@ class Codeforces(commands.Cog):
         pages = [make_page(chunk) for chunk in paginator.chunkify(data, 10)]
         paginator.paginate(self.bot, ctx.channel, pages, wait_time=5 * 60, set_pagenum_footers=True)
 
-    @commands.command(brief='Report challenge completion', aliases=['gotbad'])
+    @commands.command(brief='Report challenge completion', aliases=['gotbad', 'gg'])
     @cf_common.user_guard(group='gitgud')
     async def gotgud(self, ctx):
         handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(ctx.author),))
