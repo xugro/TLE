@@ -420,7 +420,7 @@ class Handles(commands.Cog):
 
     @handle.command(brief='Handle set with button')
     @commands.has_any_role(constants.TLE_ADMIN, constants.TLE_MODERATOR)
-    async def setregistermessage(self, ctx, message:str, label:str ):
+    async def setregistermessage(self, ctx, message:str ):
         """Generate a message with a button for people to link their codeforces accounts."""
         await ctx.send(message, view=permaview.PersistentView() )
 
