@@ -531,11 +531,12 @@ class RanklistCache:
     async def run(self):
         self._update_task.start()
 
-    def get_ranklist(self, contest):
-        try:
-            return self.ranklist_by_contest[contest.id]
-        except KeyError:
+    # Currently ranklist monitoring only supports caching unofficial ranklists
+    # If official ranklist is asked, the cache will throw RanklistNotMonitored Error
+    def get_ranklist(self, contest, show_official):
+        if show_official or contest.id not in self.ranklist_by_contest:  
             raise RanklistNotMonitored(contest)
+        return self.ranklist_by_contest[contest.id]
 
     @tasks.task_spec(name='RanklistCacheUpdate',
                      waiter=tasks.Waiter.for_event(events.ContestListRefresh))
@@ -583,11 +584,11 @@ class RanklistCache:
         for contest_id, ranklist in ranklist_by_contest.items():
             self.ranklist_by_contest[contest_id] = ranklist
 
-    async def generate_ranklist(self, contest_id, *, fetch_changes=False, predict_changes=False):
+    async def generate_ranklist(self, contest_id, *, fetch_changes=False, predict_changes=False, show_unofficial=True):
         assert fetch_changes ^ predict_changes
 
         contest, problems, standings = await cf.contest.standings(contest_id=contest_id,
-                                                                  show_unofficial=True)
+                                                                  show_unofficial=show_unofficial)
         now = time.time()
 
         # Exclude PRACTICE and MANAGER
