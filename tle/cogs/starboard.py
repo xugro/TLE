@@ -10,7 +10,6 @@ from tle.util import discord_common
 
 _STAR = '\N{WHITE MEDIUM STAR}'
 _STAR_ORANGE = 0xffaa10
-_STAR_THRESHOLD = 5
 
 
 class StarboardCogError(commands.CommandError):
@@ -88,7 +87,7 @@ class Starboard(commands.Cog):
 
         reaction_count = sum(reaction.count for reaction in message.reactions
                              if str(reaction) == _STAR)
-        if reaction_count < _STAR_THRESHOLD:
+        if reaction_count < constants.STARBOARD_THRESHOLD:
             return
         lock = self.locks.get(payload.guild_id)
         if lock is None:
