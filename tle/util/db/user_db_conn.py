@@ -188,6 +188,19 @@ class UserDbConn:
             ')'
         )
         self.conn.execute(
+            'CREATE TABLE IF NOT EXISTS skullboard ('
+            'guild_id     TEXT PRIMARY KEY,'
+            'channel_id   TEXT'
+            ')'
+        )
+        self.conn.execute(
+            'CREATE TABLE IF NOT EXISTS skullboard_message ('
+            'original_msg_id    TEXT PRIMARY KEY,'
+            'skullboard_msg_id   TEXT,'
+            'guild_id           TEXT'
+            ')'
+        )
+        self.conn.execute(
             'CREATE TABLE IF NOT EXISTS rankup ('
             'guild_id     TEXT PRIMARY KEY,'
             'channel_id   TEXT'
@@ -603,6 +616,59 @@ class UserDbConn:
 
     def clear_starboard_messages_for_guild(self, guild_id):
         query = ('DELETE FROM starboard_message '
+                 'WHERE guild_id = ?')
+        rc = self.conn.execute(query, (guild_id,)).rowcount
+        self.conn.commit()
+        return rc
+
+    def get_skullboard(self, guild_id): #copy of skullboard (probably better way to do this)
+        query = ('SELECT channel_id '
+                 'FROM skullboard '
+                 'WHERE guild_id = ?')
+        return self.conn.execute(query, (guild_id,)).fetchone()
+
+    def set_skullboard(self, guild_id, channel_id):
+        query = ('INSERT OR REPLACE INTO skullboard '
+                 '(guild_id, channel_id) '
+                 'VALUES (?, ?)')
+        self.conn.execute(query, (guild_id, channel_id))
+        self.conn.commit()
+
+    def clear_skullboard(self, guild_id):
+        query = ('DELETE FROM skullboard '
+                 'WHERE guild_id = ?')
+        self.conn.execute(query, (guild_id,))
+        self.conn.commit()
+
+    def add_skullboard_message(self, original_msg_id, skullboard_msg_id, guild_id):
+        query = ('INSERT INTO skullboard_message '
+                 '(original_msg_id, skullboard_msg_id, guild_id) '
+                 'VALUES (?, ?, ?)')
+        self.conn.execute(query, (original_msg_id, skullboard_msg_id, guild_id))
+        self.conn.commit()
+
+    def check_exists_skullboard_message(self, original_msg_id):
+        query = ('SELECT 1 '
+                 'FROM skullboard_message '
+                 'WHERE original_msg_id = ?')
+        res = self.conn.execute(query, (original_msg_id,)).fetchone()
+        return res is not None
+
+    def remove_skullboard_message(self, *, original_msg_id=None, skullboard_msg_id=None):
+        assert (original_msg_id is None) ^ (skullboard_msg_id is None)
+        if original_msg_id is not None:
+            query = ('DELETE FROM skullboard_message '
+                     'WHERE original_msg_id = ?')
+            rc = self.conn.execute(query, (original_msg_id,)).rowcount
+        else:
+            query = ('DELETE FROM skullboard_message '
+                     'WHERE skullboard_msg_id = ?')
+            rc = self.conn.execute(query, (skullboard_msg_id,)).rowcount
+        self.conn.commit()
+        return rc
+
+    def clear_skullboard_messages_for_guild(self, guild_id):
+        query = ('DELETE FROM skullboard_message '
                  'WHERE guild_id = ?')
         rc = self.conn.execute(query, (guild_id,)).rowcount
         self.conn.commit()
