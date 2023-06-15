@@ -571,6 +571,7 @@ class UserDbConn:
     def set_starboard(self, guild_id, channel_id, star_threshold):
         query = ('INSERT OR REPLACE INTO starboard '
                  '(guild_id, channel_id, star_threshold) '
+                 'VALUES (?, ?, ?)')
         self.conn.execute(query, (guild_id, channel_id, star_threshold))
         self.conn.commit()
 
