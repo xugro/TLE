@@ -24,7 +24,6 @@ class Skullboard(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        self.logger.info( "reaction added: " + str(payload.emoji) )
         if str(payload.emoji) != _SKULL or payload.guild_id is None:
             return
         res = cf_common.user_db.get_skullboard(payload.guild_id)
