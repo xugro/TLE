@@ -117,7 +117,7 @@ class Starboard(commands.Cog):
         if res is not None:
             raise StarboardCogError('The starboard channel is already set. Use `clear` before '
                                     'attempting to set a different channel as starboard.')
-        if( threshold < 1 )
+        if( threshold < 1 ):
             raise StarboardCogError('Star threshold cannot be lower than 1.')
         
         cf_common.user_db.set_starboard(ctx.guild.id, ctx.channel.id, threshold)
