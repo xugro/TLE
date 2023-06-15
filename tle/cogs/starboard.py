@@ -87,7 +87,10 @@ class Starboard(commands.Cog):
 
         reaction_count = sum(reaction.count for reaction in message.reactions
                              if str(reaction) == _STAR)
-        threshold = cf_common.user_db.get_starboard_threshold(payload.guild_id)
+        res = cf_common.user_db.get_starboard_threshold(payload.guild_id)
+        if res is None:
+            raise StarboardCogError('Star threshold not set.')
+        threshold = res[0]
         if reaction_count < threshold:
             return
         lock = self.locks.get(payload.guild_id)
