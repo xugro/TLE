@@ -26,7 +26,7 @@ class Starboard(commands.Cog):
     async def on_raw_reaction_add(self, payload):
         if str(payload.emoji) != _STAR or payload.guild_id is None:
             return
-        res = cf_common.user_db.get_starboard(payload.guild_id)
+        res = cf_common.user_db.get_starboard_channel(payload.guild_id)
         if res is None:
             return
         starboard_channel_id = int(res[0])
@@ -39,7 +39,7 @@ class Starboard(commands.Cog):
     async def on_raw_message_delete(self, payload):
         if payload.guild_id is None:
             return
-        res = cf_common.user_db.get_starboard(payload.guild_id)
+        res = cf_common.user_db.get_starboard_channel(payload.guild_id)
         if res is None:
             return
         starboard_channel_id = int(res[0])
@@ -87,7 +87,8 @@ class Starboard(commands.Cog):
 
         reaction_count = sum(reaction.count for reaction in message.reactions
                              if str(reaction) == _STAR)
-        if reaction_count < constants.STARBOARD_THRESHOLD:
+        threshold = cf_common.user_db.get_starboard_threshold(payload.guild_id)
+        if reaction_count < threshold:
             return
         lock = self.locks.get(payload.guild_id)
         if lock is None:
@@ -111,11 +112,11 @@ class Starboard(commands.Cog):
     @commands.has_role(constants.TLE_ADMIN)
     async def here(self, ctx):
         """Set the current channel as starboard."""
-        res = cf_common.user_db.get_starboard(ctx.guild.id)
+        res = cf_common.user_db.get_starboard_channel(ctx.guild.id)
         if res is not None:
             raise StarboardCogError('The starboard channel is already set. Use `clear` before '
                                     'attempting to set a different channel as starboard.')
-        cf_common.user_db.set_starboard(ctx.guild.id, ctx.channel.id)
+        cf_common.user_db.set_starboard(ctx.guild.id, ctx.channel.id, constants.STARBOARD_THRESHOLD)
         await ctx.send(embed=discord_common.embed_success('Starboard channel set'))
 
     @starboard.command(brief='Clear starboard settings')
