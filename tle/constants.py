@@ -27,3 +27,4 @@ TLE_ADMIN = os.environ.get('TLE_ADMIN', 'Admin')
 TLE_MODERATOR = os.environ.get('TLE_MODERATOR', 'Moderator')
 
 STARBOARD_THRESHOLD = int(os.environ.get('STARBOARD_THRESHOLD', 5))
+SKULLBOARD_THRESHOLD = int(os.environ.get('STARBOARD_THRESHOLD', STARBOARD_THRESHOLD))

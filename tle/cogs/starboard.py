@@ -24,6 +24,7 @@ class Starboard(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
+        self.logger.info( "reaction added: " + str(payload.emoji) )
         if str(payload.emoji) != _STAR or payload.guild_id is None:
             return
         res = cf_common.user_db.get_starboard(payload.guild_id)
