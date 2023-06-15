@@ -110,13 +110,17 @@ class Starboard(commands.Cog):
 
     @starboard.command(brief='Set starboard to current channel')
     @commands.has_role(constants.TLE_ADMIN)
-    async def here(self, ctx):
-        """Set the current channel as starboard."""
+    async def here(self, ctx, threshold: int = constants.STARBOARD_THRESHOLD):
+        """Set the current channel as starboard.
+        - Type ;starboard here <nr> to set threshold"""
         res = cf_common.user_db.get_starboard_channel(ctx.guild.id)
         if res is not None:
             raise StarboardCogError('The starboard channel is already set. Use `clear` before '
                                     'attempting to set a different channel as starboard.')
-        cf_common.user_db.set_starboard(ctx.guild.id, ctx.channel.id, constants.STARBOARD_THRESHOLD)
+        if( threshold < 1 )
+            raise StarboardCogError('Star threshold cannot be lower than 1.')
+        
+        cf_common.user_db.set_starboard(ctx.guild.id, ctx.channel.id, threshold)
         await ctx.send(embed=discord_common.embed_success('Starboard channel set'))
 
     @starboard.command(brief='Clear starboard settings')
