@@ -181,6 +181,11 @@ class UserDbConn:
             'star_threshold  INTEGER NOT NULL'
             ')'
         )
+
+        columns = [i[1] for i in self.conn.execute('PRAGMA table_info(starboard)')]
+        if 'star_threshold' not in columns:
+            self.conn.execute('ALTER TABLE starboard ADD COLUMN star_threshold INTEGER NOT NULL')
+        
         self.conn.execute(
             'CREATE TABLE IF NOT EXISTS starboard_message ('
             'original_msg_id    TEXT PRIMARY KEY,'
