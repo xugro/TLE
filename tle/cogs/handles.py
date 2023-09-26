@@ -443,7 +443,7 @@ class Handles(commands.Cog):
         user = cf_common.user_db.fetch_cf_user(handle)
         member = ctx.guild.get_member(user_id)
         if member is None:
-            raise HandleCogError(f'{user_id} not found in the guild')
+            raise HandleCogError(f'User {user_id} not found in the guild')
         embed = _make_profile_embed(member, user, mode='get')
         await ctx.send(embed=embed)
 
@@ -455,7 +455,7 @@ class Handles(commands.Cog):
         handle, = await cf_common.resolve_handles(ctx, self.converter, [handle])
         user_id = cf_common.user_db.get_user_id(handle, ctx.guild.id)
         if user_id is None:
-            raise HandleCogError(f'{handle} not found in database')
+            raise HandleCogError(f'Handle `{handle}` not found in database')
 
         cf_common.user_db.remove_handle(handle, ctx.guild.id)
         member = ctx.guild.get_member(user_id)
