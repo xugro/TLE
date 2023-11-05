@@ -4,6 +4,7 @@ from typing import List
 import math
 import time
 from collections import defaultdict
+import logging
 
 import discord
 from discord.ext import commands
@@ -41,6 +42,7 @@ class Codeforces(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.converter = commands.MemberConverter()
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     # more points seasons start at April 1st 2023 (timestamp: 1680300000) and is only active in the last 7 days of the month
 
@@ -145,7 +147,7 @@ class Codeforces(commands.Cog):
             paginator.paginate(self.bot, ctx.channel, pages, wait_time=5 * 60, set_pagenum_footers=True)   
 
     @commands.command(brief='Recommend a problem',
-                      usage='[+tag..] [~tag..] [rating|rating1-rating2]')
+                      usage='[+tag..] [~tag..] [+divX] [~divX] [rating|rating1-rating2]')
     @cf_common.user_guard(group='gitgud')
     async def gimme(self, ctx, *args):
         handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(ctx.author),))
@@ -234,7 +236,7 @@ class Codeforces(commands.Cog):
         pages = [make_page(chunk) for chunk in paginator.chunkify(submissions[:100], 10)]
         paginator.paginate(self.bot, ctx.channel, pages, wait_time=5 * 60, set_pagenum_footers=True)
 
-    @commands.command(brief='Create a mashup', usage='[handles] [+tag..] [~tag..] [?[-]delta]')
+    @commands.command(brief='Create a mashup', usage='[handles] [+tag..] [~tag..] [+divX] [~divX] [?[-]delta]')
     async def mashup(self, ctx, *args):
         """Create a mashup contest using problems within -200 and +400 of average rating of handles provided.
         Add tags with "+" before them.
@@ -292,11 +294,12 @@ class Codeforces(commands.Cog):
         await ctx.send(f'Mashup contest for `{str_handles}`', embed=embed)
 
     @commands.command(brief='Challenge', aliases=['gitbad'],
-                      usage='[delta=0|r=rating] [+tags...] [~tags...]')
+                      usage='[delta=0|r=rating] [+tags] [~tags] [+divX] [~divX]')
     @cf_common.user_guard(group='gitgud')
     async def gitgud(self, ctx, *args):
         """Gitgud: You can request a problem from the bots relative to your current rating with ;gitgud <delta>
-        - It is also possible to request problems with a certain tag now but you get less points for it: ;gitgud <delta>|r=<rating> [+tags...] [~tags...]
+        - Filter problems by division with [+divX] [~divX], possible values are [div1, div2, div3, div4, edu]
+        - Request problems with/without certain tags with ;gitgud <delta>|r=<rating> [+tags] [~tags]
         - After solving the problem you can claim gitgud points for it with ;gotgud
         - If you can't solve the problem for 2 hours you can skip it with ;nogud
         - The all-time ranklist can be found with ;gitgudders
@@ -356,6 +359,11 @@ class Codeforces(commands.Cog):
             problem.contestId).startTimeSeconds)
 
         choice = max(random.randrange(len(problems)) for _ in range(5))
+
+        # remove division tags since we dont want them to reduce points
+        tags = [tag for tag in tags if tag not in cache_system2._DIV_TAGS]
+        bantags = [tag for tag in bantags if tag not in cache_system2._DIV_TAGS]
+
         if tags or bantags:
             delta = delta - 200
         await self._gitgud(ctx, handle, problems[choice], delta)
@@ -482,6 +490,9 @@ class Codeforces(commands.Cog):
     @commands.has_any_role(constants.TLE_ADMIN, constants.TLE_MODERATOR)
     async def _nogud(self, ctx, member: discord.Member):
         active = cf_common.user_db.check_challenge(member.id)
+        if not active:
+            await ctx.send(f'No active challenge found for user `{member.display_name}`.')
+            return
         rc = cf_common.user_db.skip_challenge(member.id, active[0], Gitgud.FORCED_NOGUD)
         if rc == 1:
             await ctx.send(f'Challenge skip forced.')
