@@ -571,7 +571,7 @@ class Handles(commands.Cog):
             discord_file = get_gudgitters_image(chunk)
             discord_files.append(discord_file)
             embed = discord_common.cf_color_embed()
-            embed.set_image(url='attachment://gudgitters_{chunk[0][0]}.png')
+            embed.set_image(url=f'attachment://gudgitters_{chunk[0][0]}.png')
             return (title, embed)
 
         pages = [make_page(chunk) for chunk in paginator.chunkify(rankings, 20)]
