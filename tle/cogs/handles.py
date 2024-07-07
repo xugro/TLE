@@ -569,7 +569,7 @@ class Handles(commands.Cog):
             discord_file = get_gudgitters_image(chunk)
             embed = discord_common.cf_color_embed()
             embed.set_image(url='attachment://gudgitters.png')
-            return (title, embed, file)
+            return (title, embed, discord_file)
 
         pages = [make_page(chunk) for chunk in paginator.chunkify(rankings, 20)]
         paginator.paginate(self.bot, ctx.channel, pages, wait_time=5 * 60, set_pagenum_footers=True)
