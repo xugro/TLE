@@ -38,8 +38,11 @@ class Paginated:
 
     async def show_page(self, page_num):
         if 1 <= page_num <= len(self.pages):
-            content, embed = self.pages[page_num - 1]
-            await self.message.edit(content=content, embed=embed)
+            if len(self.pages[page_num -1]) == 2:
+                content, embed = self.pages[page_num - 1]
+                await self.message.edit(content=content, embed=embed)
+            if len(self.pages[page_num -1]) == 3:
+                await self.message.edit(file=file, content=content, embed=embed)
             self.cur_page = page_num
 
     async def prev_page(self):
@@ -49,8 +52,12 @@ class Paginated:
         await self.show_page(self.cur_page + 1)
 
     async def paginate(self, bot, channel, wait_time, delete_after:float = None):
-        content, embed = self.pages[0]
-        self.message = await channel.send(content, embed=embed, delete_after=delete_after)
+        if len(self.pages[0]) == 2:
+            content, embed = self.pages[0]
+            self.message = await channel.send(content, embed=embed, delete_after=delete_after)
+        if len(self.pages[0]) == 3:
+            content, embed, file = self.pages[0]
+            self.message = await channel.send(content, file=file, embed=embed, delete_after=delete_after)
 
         if len(self.pages) == 1:
             # No need to paginate.
