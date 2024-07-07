@@ -45,7 +45,7 @@ class Paginated:
                 await self.message.edit(content=content, embed=embed)
             if len(self.pages[page_num -1]) == 3:
                 content, embed, data = self.pages[page_num -1]
-                await self.message.edit(attachments = [discord.File(data, 'image.png')], content=content, embed=embed)
+                await self.message.edit(attachments = [discord.File(data.copy(), 'image.png')], content=content, embed=embed)
             self.cur_page = page_num
 
     async def prev_page(self):
@@ -60,7 +60,7 @@ class Paginated:
             self.message = await channel.send(content, embed=embed, delete_after=delete_after)
         if len(self.pages[0]) == 3:
             content, embed, data = self.pages[0]
-            self.message = await channel.send(content, file=discord.File(data, 'image.png'), embed=embed, delete_after=delete_after)
+            self.message = await channel.send(content, file=discord.File(data.copy(), 'image.png'), embed=embed, delete_after=delete_after)
 
         if len(self.pages) == 1:
             # No need to paginate.
