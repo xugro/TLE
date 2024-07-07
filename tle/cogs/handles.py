@@ -162,7 +162,7 @@ def get_gudgitters_image(rankings):
     image_data = io.BytesIO()
     surface.write_to_png(image_data)
     image_data.seek(0)
-    discord_file = discord.File(image_data, filename='gudgitters.png')
+    discord_file = discord.File(image_data, filename=f'gudgitters_{rankings[0][0]}.png')
     return discord_file
 
 def get_prettyhandles_image(rows, font):
@@ -558,21 +558,24 @@ class Handles(commands.Cog):
                 
                 rankings.append((index, discord_handle, handle, rating, score))
                 index += 1
-            if index == 5 * 20:
+            if index == 5 * 20: # maximum of 10 images per message are accepted by discord
                 break
 
         if not rankings:
             raise HandleCogError('No one has completed a gitgud challenge, send ;gitgud to request and ;gotgud to mark it as complete')
 
+        discord_files = [];
+
         def make_page(chunk):
             title = '';
             discord_file = get_gudgitters_image(chunk)
+            discord_files.append(discord_file)
             embed = discord_common.cf_color_embed()
-            embed.set_image(url='attachment://gudgitters.png')
-            return (title, embed, discord_file)
+            embed.set_image(url='attachment://gudgitters_{chunk[0][0]}.png')
+            return (title, embed)
 
         pages = [make_page(chunk) for chunk in paginator.chunkify(rankings, 20)]
-        paginator.paginate(self.bot, ctx.channel, pages, wait_time=5 * 60, set_pagenum_footers=True)
+        paginator.paginate(self.bot, ctx.channel, pages, wait_time=5 * 60, set_pagenum_footers=True, files=discord_files)
 
     def filter_rating_changes(self, rating_changes):
         rating_changes = [change for change in rating_changes
