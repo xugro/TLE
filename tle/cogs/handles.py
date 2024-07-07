@@ -563,8 +563,16 @@ class Handles(commands.Cog):
 
         if not rankings:
             raise HandleCogError('No one has completed a gitgud challenge, send ;gitgud to request and ;gotgud to mark it as complete')
-        discord_file = get_gudgitters_image(rankings)
-        await ctx.send(file=discord_file)
+
+        def make_page(chunk):
+            title = '';
+            discord_file = get_gudgitters_image(chunk)
+            embed = discord_common.cf_color_embed()
+            embed.set_image(url='attachment://gudgitters.png')
+            return (title, embed, file)
+
+        pages = [make_page(chunk) for chunk in paginator.chunkify(rankings, 20)]
+        paginator.paginate(self.bot, ctx.channel, pages, wait_time=5 * 60, set_pagenum_footers=True)
 
     def filter_rating_changes(self, rating_changes):
         rating_changes = [change for change in rating_changes
