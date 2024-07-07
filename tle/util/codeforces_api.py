@@ -374,6 +374,7 @@ class user:
             f'will be chunkified into {len(chunks)} requests.')
 
         result = []
+        count = 0
         for chunk in chunks:
             params = {'handles': ';'.join(chunk)}
             try:
@@ -385,6 +386,8 @@ class user:
                     raise HandleNotFoundError(e.comment, handle)
                 raise
             result += [make_from_dict(User, user_dict) for user_dict in resp]
+            count += len(chunk)
+        logger.info(f"user.info was called for {count} entries and {len(result)} User objects could be created.")
         return [cf_common.fix_urls(user) for user in result]
 
     @staticmethod
@@ -460,7 +463,7 @@ async def _needs_fixing(handles):
 
                 # Users could still have changed capitalization
                 for handle, cf_user in zip(handle_chunk, cf_users):
-                    assert handle.lower() == cf_user.handle.lower()
+                    assert handle.lower() == cf_user.handle.lower(),f"{handle.lower()} differs from {cf_user.handle.lower()}"
                     if handle != cf_user.handle:
                         to_fix.append(handle)
                 break
