@@ -38,8 +38,12 @@ class Paginated:
 
     async def show_page(self, page_num):
         if 1 <= page_num <= len(self.pages):
-            content, embed = self.pages[page_num - 1]
-            await self.message.edit(content=content, embed=embed)
+            if len(self.pages[page_num -1]) == 2:
+                content, embed = self.pages[page_num - 1]
+                await self.message.edit(content=content, embed=embed)
+            if len(self.pages[page_num -1]) == 3:
+                content, embed, data = self.pages[page_num -1]
+                await self.message.edit(attachments = [discord.File(data, 'image.png')], content=content, embed=embed)
             self.cur_page = page_num
 
     async def prev_page(self):
@@ -48,9 +52,13 @@ class Paginated:
     async def next_page(self):
         await self.show_page(self.cur_page + 1)
 
-    async def paginate(self, bot, channel, wait_time, delete_after:float = None, files = []):
-        content, embed = self.pages[0]
-        self.message = await channel.send(content, files=files, embed=embed, delete_after=delete_after)
+    async def paginate(self, bot, channel, wait_time, delete_after:float = None):
+        if len(self.pages[0]) == 2:
+            content, embed = self.pages[0]
+            self.message = await channel.send(content, embed=embed, delete_after=delete_after)
+        if len(self.pages[0]) == 3:
+            content, embed, data = self.pages[0]
+            self.message = await channel.send(content, file=discord.File(data, 'image.png'), embed=embed, delete_after=delete_after)
 
         if len(self.pages) == 1:
             # No need to paginate.
@@ -75,14 +83,18 @@ class Paginated:
                 break
 
 
-def paginate(bot, channel, pages, *, wait_time, set_pagenum_footers=False, delete_after:float = None, files = []):
+def paginate(bot, channel, pages, *, wait_time, set_pagenum_footers=False, delete_after:float = None):
     if not pages:
         raise NoPagesError()
     permissions = channel.permissions_for(channel.guild.me)
     if not permissions.manage_messages:
         raise InsufficientPermissionsError('Permission to manage messages required')
     if len(pages) > 1 and set_pagenum_footers:
-        for i, (content, embed) in enumerate(pages):
-            embed.set_footer(text=f'Page {i + 1} / {len(pages)}')
+        if len(pages[0]) == 2:
+            for i, (content, embed) in enumerate(pages):
+                embed.set_footer(text=f'Page {i + 1} / {len(pages)}')
+        if len(pages[0]) == 3:
+            for i, (content, embed, data) in enumerate(pages):
+                embed.set_footer(text=f'Page {i + 1} / {len(pages)}')
     paginated = Paginated(pages)
-    asyncio.create_task(paginated.paginate(bot, channel, wait_time, delete_after, files))
+    asyncio.create_task(paginated.paginate(bot, channel, wait_time, delete_after))
