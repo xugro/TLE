@@ -163,8 +163,7 @@ def get_gudgitters_image(rankings):
     image_data = io.BytesIO()
     surface.write_to_png(image_data)
     image_data.seek(0)
-    discord_file = discord.File(image_data, filename='gudgitters.png')
-    return discord_file
+    return image_data
 
 def get_prettyhandles_image(rows, font):
     """return PIL image for rankings"""
@@ -565,13 +564,21 @@ class Handles(commands.Cog):
                 
                 rankings.append((index, discord_handle, handle, rating, score))
                 index += 1
-            if index == 20:
+            if index == 5 * 20:
                 break
 
         if not rankings:
             raise HandleCogError('No one has completed a gitgud challenge, send ;gitgud to request and ;gotgud to mark it as complete')
-        discord_file = get_gudgitters_image(rankings)
-        await ctx.send(file=discord_file)
+
+        def make_page(chunk):
+            title = '';
+            image_data = get_gudgitters_image(chunk)
+            embed = discord_common.cf_color_embed()
+            embed.set_image(url='attachment://image.png')
+            return (title, embed, image_data)
+
+        pages = [make_page(chunk) for chunk in paginator.chunkify(rankings, 20)]
+        paginator.paginate(self.bot, ctx.channel, pages, wait_time=5 * 60, set_pagenum_footers=True)
 
     def filter_rating_changes(self, rating_changes):
         rating_changes = [change for change in rating_changes
@@ -654,13 +661,21 @@ class Handles(commands.Cog):
                 rating = rating_changes[-1].newRating
                 rankings.append((index, discord_handle, handle, rating, score))
                 index += 1
-            if index == 20:
+            if index == 5 * 20:
                 break
 
         if not rankings:
             raise HandleCogError('No one has completed a gitgud challenge, send ;gitgud to request and ;gotgud to mark it as complete')
-        discord_file = get_gudgitters_image(rankings)
-        await ctx.send(file=discord_file)
+
+        def make_page(chunk):
+            title = '';
+            image_data = get_gudgitters_image(chunk)
+            embed = discord_common.cf_color_embed()
+            embed.set_image(url='attachment://image.png')
+            return (title, embed, image_data)
+
+        pages = [make_page(chunk) for chunk in paginator.chunkify(rankings, 20)]
+        paginator.paginate(self.bot, ctx.channel, pages, wait_time=5 * 60, set_pagenum_footers=True)
 
     @handle.command(brief="Show all handles")
     async def list(self, ctx, *countries):
