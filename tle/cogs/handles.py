@@ -558,7 +558,7 @@ class Handles(commands.Cog):
                 
                 rankings.append((index, discord_handle, handle, rating, score))
                 index += 1
-            if index == 20:
+            if index == 5 * 20:
                 break
 
         if not rankings:
