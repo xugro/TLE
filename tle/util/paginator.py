@@ -48,7 +48,7 @@ class Paginated:
     async def next_page(self):
         await self.show_page(self.cur_page + 1)
 
-    async def paginate(self, bot, channel, wait_time, delete_after:float = None, files):
+    async def paginate(self, bot, channel, wait_time, delete_after:float = None, files = []):
         content, embed = self.pages[0]
         self.message = await channel.send(content, files=files, embed=embed, delete_after=delete_after)
 
