@@ -557,7 +557,7 @@ class Handles(commands.Cog):
                 
                 rankings.append((index, discord_handle, handle, rating, score))
                 index += 1
-            if index == 5 * 20: # maximum of 10 images per message are accepted by discord
+            if index == 5 * 20:
                 break
 
         if not rankings:
