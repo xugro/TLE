@@ -89,7 +89,11 @@ def paginate(bot, channel, pages, *, wait_time, set_pagenum_footers=False, delet
     if not permissions.manage_messages:
         raise InsufficientPermissionsError('Permission to manage messages required')
     if len(pages) > 1 and set_pagenum_footers:
-        for i, (content, embed) in enumerate(pages):
-            embed.set_footer(text=f'Page {i + 1} / {len(pages)}')
+        if len(pages[0]) == 2:
+            for i, (content, embed) in enumerate(pages):
+                embed.set_footer(text=f'Page {i + 1} / {len(pages)}')
+        if len(pages[0]) == 3:
+            for i, (content, embed, file) in enumerate(pages):
+                embed.set_footer(text=f'Page {i + 1} / {len(pages)}')
     paginated = Paginated(pages)
     asyncio.create_task(paginated.paginate(bot, channel, wait_time, delete_after))
