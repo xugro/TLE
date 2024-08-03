@@ -618,7 +618,7 @@ class Codeforces(commands.Cog):
     @commands.command(brief='Calculate team rating', usage='[handles] [+peak]')
     async def teamrate(self, ctx, *args: str):
         """Provides the combined rating of the entire team.
-        If +server is provided as the only handle, will display the rating of the entire server.
+        If +server is provided, will display the rating of the entire server.
         Supports multipliers. e.g: ;teamrate gamegame*1000"""
 
         (is_entire_server, peak), handles = cf_common.filter_flags(args, ['+server', '+peak'])
@@ -634,18 +634,29 @@ class Codeforces(commands.Cog):
         else:
             def normalize(x):
                 return [i.lower() for i in x]
-            handle_counts = {}
+            class Counter(dict):
+                def __missing__(self, key):
+                    return 0
+            handle_counts = Counter();
             parsed_handles = []
             for i in handles:
                 parse_str = normalize(i.split('*'))
+                if parse_str[0][0] == '+':
+                    parse_str[0] = parse_str[0].lstrip('+')
+                else:
+                    handle_counts[parse_str[0]] = 0
+
                 if len(parse_str) > 1:
                     try:
-                        handle_counts[parse_str[0]] = int(parse_str[1])
+                        handle_counts[parse_str[0]] += int(parse_str[1])
                     except ValueError:
                         raise CodeforcesCogError("Can't multiply by non-integer")
                 else:
-                    handle_counts[parse_str[0]] = 1
-                parsed_handles.append(parse_str[0])
+                    handle_counts[parse_str[0]] += 1
+
+            handle_counts = {x:y for x,y in handle_counts.items() if y!=0}
+            for handle in handle_counts:
+                parsed_handles.append(handle)
 
             cf_handles = await cf_common.resolve_handles(ctx, self.converter, parsed_handles, mincnt=1, maxcnt=1000)
             cf_handles = normalize(cf_handles)
