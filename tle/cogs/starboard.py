@@ -83,7 +83,7 @@ class Starboard(commands.Cog):
         channel = self.bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
         if (message.created_at < datetime.datetime.now() - datetime.timedelta(days=365))
-            raise StarboardCogError('Message is older than 365 days')
+            raise StarboardCogError('Message is older than 365 days'):
         if ((message.type != discord.MessageType.default and message.type != discord.MessageType.reply)
             or (len(message.content) == 0 and len(message.attachments) == 0)):
             raise StarboardCogError('Cannot starboard this message')
