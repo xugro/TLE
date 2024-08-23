@@ -203,7 +203,7 @@ def get_prettyhandles_image(rows, font):
         name = _trim(name)
         handle = _trim(handle)
         color = rating_to_color(rating)
-        draw_row(str(pos), name, handle, str(rating) if rating else 'N/A', color, y)
+        draw_row(str(pos.), name, handle, str(rating) if rating else 'N/A', color, y)
         if rating and rating >= 3000:  # nutella
             nutella_x = START_X + WIDTH_RANK
             draw.text((nutella_x, y), name[0], fill=BLACK, font=font)
@@ -520,7 +520,7 @@ class Handles(commands.Cog):
             lines += failed
         return discord_common.embed_success('\n'.join(lines))
 
-    @commands.command(brief="Show gudgitters", aliases=["gitgudders", "gitbadders", "gg"], usage="[div1|div2|div3] [+all]")
+    @commands.command(brief="Show gudgitters", aliases=["gitgudders", "gitbadders"], usage="[div1|div2|div3] [+all]")
     async def gudgitters(self, ctx, *args):
         """Show the list of users of gitgud with their scores."""
         res = cf_common.user_db.get_gudgitters()
@@ -585,7 +585,7 @@ class Handles(commands.Cog):
                     if self.dlo <= change.ratingUpdateTimeSeconds < self.dhi]
         return rating_changes
 
-    @commands.command(brief="Show gudgitters of the month", aliases=["monthlygitgudders","monthlygg","monthlygitbadders", "mgg"], usage="[div1|div2|div3] [d=mmyyyy] [+all]")
+    @commands.command(brief="Show gudgitters of the month", aliases=["monthlygitgudders","monthlygg","monthlygitbadders"], usage="[div1|div2|div3] [d=mmyyyy] [+all]")
     async def monthlygudgitters(self, ctx, *args):
         """Show the list of users of gitgud with their scores."""
         
