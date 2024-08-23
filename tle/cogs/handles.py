@@ -203,7 +203,7 @@ def get_prettyhandles_image(rows, font):
         name = _trim(name)
         handle = _trim(handle)
         color = rating_to_color(rating)
-        draw_row(str(pos.), name, handle, str(rating) if rating else 'N/A', color, y)
+        draw_row(str(pos), name, handle, str(rating) if rating else 'N/A', color, y)
         if rating and rating >= 3000:  # nutella
             nutella_x = START_X + WIDTH_RANK
             draw.text((nutella_x, y), name[0], fill=BLACK, font=font)
